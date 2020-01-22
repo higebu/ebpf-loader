@@ -8,11 +8,14 @@ import (
 	"github.com/newtools/ebpf"
 )
 
-var path = flag.String("path", "./src/example.o", "ebpf object file path")
+var (
+	obj  = flag.String("obj", "./src/example.o", "ebpf object file path")
+	path = flag.String("dir", "", "path to pin the objects")
+)
 
 func main() {
 	flag.Parse()
-	spec, err := ebpf.LoadCollectionSpec(*path)
+	spec, err := ebpf.LoadCollectionSpec(*obj)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -24,6 +27,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
+	}
+	if *path != "" {
+		coll.Pin(*path, 0755)
 	}
 	defer coll.Close()
 	fmt.Printf("%s\n", coll)
